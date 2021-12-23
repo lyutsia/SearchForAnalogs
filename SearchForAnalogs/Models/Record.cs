@@ -33,6 +33,7 @@ namespace SearchForAnalogs.Models
         {
             Id = id;
         }
+
        
     }
 }

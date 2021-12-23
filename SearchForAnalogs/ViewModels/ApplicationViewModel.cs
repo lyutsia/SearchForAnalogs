@@ -35,6 +35,7 @@ namespace SearchForAnalogs
         {
 
             db = new AnalogsDBContext();
+     
             //загрузка данных из бд
             Records = new ObservableCollection<RecordViewModel>(db.Records
                                 .Include(u => u.Product1)
@@ -42,7 +43,10 @@ namespace SearchForAnalogs
                                 .Include(u => u.Product2)
                                     .ThenInclude(c => c.Manufacturer)
                                 .Select(r => new RecordViewModel(r)).ToList());
+
         }
+
+
         // команда добавления
         public RelayCommand AddCommand
         {
@@ -85,6 +89,8 @@ namespace SearchForAnalogs
                               RecordAddEdit(recordViewModel, false);
                           }
                       }
+              
+                          
                   }));
             }
         }
@@ -134,6 +140,7 @@ namespace SearchForAnalogs
                           
                           // искомый товар
                           Product productEnd = new Product(newRecord.Article2, new Manufacturer(newRecord.Manufacturer2));
+
                           
                           SearchWay(productStart, productEnd, newRecord.Confidence, 0);
                           
@@ -191,9 +198,12 @@ namespace SearchForAnalogs
 
                 else
                 {
-                    Record record = newRecord.GetRecord();
-                    record.Id = 0;
-                    db.Entry(record).State = EntityState.Added;
+
+                    db.Dispose();
+                    db = new AnalogsDBContext();
+
+                    Record record = newRecord.GetRecord();                 
+                    db.Records.Update(record);
                     db.SaveChanges();
 
                 }                 
@@ -249,21 +259,24 @@ namespace SearchForAnalogs
 
                 foreach (var searchRecord in searchRecords)
                 {
-                   //добавление товара в маршрут
+                    //добавление товара в маршрут
                     way.Add(searchRecord.GetRecord().Product1);
 
                     if (searchRecord.GetRecord().Product2.Equals(productEnd))
                     {
                         //маршрут найден, добавляется последний товар
                         Product firstProduct = way.First();
-                        way = way.Distinct().ToList();
                         way.Add(productEnd);
                         ways.Add(way);
                         way = new List<Product>() { firstProduct };
                     }
                     if (searchRecord.Confidence != 0)
+                    {
                         SearchWay(searchRecord.GetRecord().Product2, productEnd, depthRecursion, currentDepthRecursion + 1);
-                    
+                        if (way.Count() > 1)
+                            way.RemoveAt(way.Count - 1);
+
+                    }
                 }
             
             }

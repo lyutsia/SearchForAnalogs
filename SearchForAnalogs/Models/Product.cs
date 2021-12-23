@@ -50,6 +50,7 @@ namespace SearchForAnalogs.Models
             return article1String==article2String &&
                 Manufacturer.Name.ToLower() == product.Manufacturer.Name.ToLower();
         }
+
        
     }
 }
