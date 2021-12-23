@@ -1,0 +1,41 @@
+﻿<Window x:Class="SearchForAnalogs.AddEditRecordSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SearchForAnalogs"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="AddEditRecordSearchWindow" ResizeMode="NoResize" Height="320" Width="445">
+    <Grid Background="#FFFAF9F9">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <WrapPanel Grid.Row="0">
+            <StackPanel Margin="25,0,0,0" >
+                <Label x:Name="articleLabel1" Content="Артикул1" HorizontalAlignment="Left" Height="Auto" Margin="0,10,0,0" VerticalAlignment="Top" Width="Auto" />
+                <ComboBox x:Name="articleCombobox1"  Height="Auto" Width="Auto" VerticalAlignment="Top" IsReadOnly="False" IsEditable="True" SelectionChanged="articleCombobox_Selected" Text="{Binding Article1}" />
+                <Label x:Name="manufacturerLabel1" Content="Производитель1" HorizontalAlignment="Left" Height="Auto" Margin="0,10,0,0" VerticalAlignment="Top" Width="Auto"/>
+                <ComboBox x:Name="manufacturerCombobox1" IsReadOnly="False" IsEditable="True" Height="Auto" Width="Auto" VerticalAlignment="Top" Text="{Binding Manufacturer1}"/>
+            </StackPanel>
+            <StackPanel Margin="70 ,0,0,0" >
+                <Label x:Name="articleLabel2" Content="Артикул2" HorizontalAlignment="Left" Height="Auto" Margin="0,10,0,0" VerticalAlignment="Top" Width="Auto" />
+                <ComboBox x:Name="articleCombobox2" IsReadOnly="False" IsEditable="True" Height="Auto" Width="Auto" VerticalAlignment="Top" SelectionChanged="articleCombobox_Selected" Text="{Binding Article2}"/>
+                <Label x:Name="manufacturerLabel2" Content="Производитель2" HorizontalAlignment="Left" Height="Auto" Margin="0,10,0,0" VerticalAlignment="Top" Width="Auto"/>
+                <ComboBox x:Name="manufacturerCombobox2" IsReadOnly="False" IsEditable="True" Height="Auto" Width="Auto" VerticalAlignment="Top" Text="{Binding Manufacturer2}"/>
+            </StackPanel>
+        </WrapPanel>
+
+        <Label Grid.Row="1" x:Name="confidenceLabel" Content="Доверие" HorizontalAlignment="Center" Height="Auto" Margin="0,5,0,0" VerticalAlignment="Top" Width="Auto" />
+        <TextBox Grid.Row="2" x:Name="confidenceTextBox" MaxLength="2" HorizontalAlignment="Center" Height="29" Margin="0,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" FontSize="18" HorizontalContentAlignment="Center" PreviewTextInput="confidenceTextBox_PreviewTextInput" Text="{Binding Confidence}" />
+
+        <WrapPanel Grid.Row="3" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <Button x:Name="OKButton" IsDefault="True" Height="30"  VerticalAlignment="Top" Click="OK_Click" Content="OK"   Width="75" Margin="10"/>
+            <Button x:Name="CancelButton" IsCancel="True" Height="30" VerticalAlignment="Top"  Click="Cancel_Click" Content="Отмена"  Width="75" Margin="10"/>
+        </WrapPanel>
+       
+    </Grid>
+</Window>

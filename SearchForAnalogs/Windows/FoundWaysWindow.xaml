@@ -1,0 +1,50 @@
+﻿<Window x:Class="SearchForAnalogs.FoundWaysWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SearchForAnalogs"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Найденные маршруты" Height="400" Width="600" ResizeMode="NoResize">
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.3*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ListView  Grid.Column="0" Name="WaysNameListView"
+                 SelectionChanged="waysName_SelectedIndexChanged" >
+            <ListView.View  >
+                <GridView>
+                    <GridViewColumn  Header="Маршруты" Width="Auto" />
+                </GridView>
+
+            </ListView.View>
+            <ListView.ItemTemplate>
+                <DataTemplate >
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{Binding }"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ListView Name="WayListView"   Grid.Column="1"  >
+            <ListView.View>
+                <GridView  >
+                    <GridViewColumn  Header="Содержание маршрута"  Width="Auto"/>
+                </GridView>
+
+            </ListView.View>
+            <ListView.ItemTemplate>
+                <DataTemplate >
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{Binding }"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        
+        
+    </Grid>
+</Window>
