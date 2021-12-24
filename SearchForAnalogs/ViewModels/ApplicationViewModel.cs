@@ -35,7 +35,7 @@ namespace SearchForAnalogs
         {
 
             db = new AnalogsDBContext();
-     
+
             //загрузка данных из бд
             Records = new ObservableCollection<RecordViewModel>(db.Records
                                 .Include(u => u.Product1)
@@ -78,15 +78,18 @@ namespace SearchForAnalogs
                       // получаем выделенный объект
                       RecordViewModel recordViewModel = selectedItem as RecordViewModel;
                      
+
                       AddEditRecordSearchWindow recordWindow = new AddEditRecordSearchWindow(recordViewModel, false);
-                     
+                      
                       if (recordWindow.ShowDialog() == true)
                       {
                           // получаем измененный объект
-                          RecordViewModel editRecord=recordWindow.CurrentRecord;                   
-                          if (editRecord != null)
+                          RecordViewModel editRecordViewModel = recordWindow.CurrentRecord;
+                          
+                          if (editRecordViewModel != null)
                           {
-                              RecordAddEdit(recordViewModel, false);
+                              RecordAddEdit(editRecordViewModel, false);                             
+                             
                           }
                       }
               
@@ -131,7 +134,7 @@ namespace SearchForAnalogs
                       if (recordWindow.ShowDialog() == true)
                       {
                           ways = new List<List<Product>>();
-                          way = new List<Product>();
+                          
                         
                           RecordViewModel newRecord = recordWindow.CurrentRecord;
 
@@ -141,7 +144,8 @@ namespace SearchForAnalogs
                           // искомый товар
                           Product productEnd = new Product(newRecord.Article2, new Manufacturer(newRecord.Manufacturer2));
 
-                          
+                          way = new List<Product>() { productStart };
+
                           SearchWay(productStart, productEnd, newRecord.Confidence, 0);
                           
                           if (ways.Count == 0)
@@ -172,22 +176,16 @@ namespace SearchForAnalogs
         /// <param name="add"></param>
         private void RecordAddEdit(RecordViewModel newRecord, bool add)
         {
-           
-            Product product1= ProductCheckAdd(newRecord.Manufacturer1, newRecord.Article1);
-            Product product2 = ProductCheckAdd(newRecord.Manufacturer2, newRecord.Article2);
-
+           Record record = newRecord.GetRecord();
             if (Records.Where(rv=>rv.EqualsWithoutId(newRecord) && rv.Id!=newRecord.Id).Count() == 0)
             {
                 if (add)
                 {
-
-                    Record record = newRecord.GetRecord();
-                    db.Entry(record).State = EntityState.Added;
+                   
+                    db.Records.Attach(record);                   
                     db.SaveChanges();
 
-                    newRecord.Id = record.Id;
-                    newRecord.Manufacturer1 = product1.Manufacturer.Name;
-                    newRecord.Manufacturer2 = product2.Manufacturer.Name;
+                    newRecord.Id = Records.Count+1;
                     Records.Add(newRecord);
 
                     //выделение добавленной записи
@@ -198,51 +196,14 @@ namespace SearchForAnalogs
 
                 else
                 {
-
-                    db.Dispose();
-                    db = new AnalogsDBContext();
-
-                    Record record = newRecord.GetRecord();                 
-                    db.Records.Update(record);
                     db.SaveChanges();
-
                 }                 
             }
             else
                 MessageBox.Show("Такая запись уже существует!");
            
         }
-        /// <summary>
-        /// Добавление в бд отсутствующих Приоизводителей и Продуктов
-        /// </summary>
-        /// <param name="manufacturerName"></param>
-        /// <param name="article"></param>
-        /// <returns></returns>
-        private Product ProductCheckAdd(string manufacturerName, string article)
-        {  
-            Manufacturer manufacturer = new Manufacturer(manufacturerName);
-           
-            if (db.Manufactureres.Find(manufacturerName) == null)
-            {
-                db.Manufactureres.Add(manufacturer);
-                db.SaveChanges();
-            }
-            else
-            {
-                manufacturer = db.Manufactureres.Find(manufacturerName);
-                
-            }
-
-            Product product = new Product(article, manufacturer);
-           
-            if (db.Products.Find(article)==null)
-            {
-                db.Entry(product).State = EntityState.Added;
-                db.SaveChanges();
-                
-            }
-            return product;
-        }
+       
         /// <summary>
         /// рекурсивный поиск аналогов
         /// </summary>
@@ -255,12 +216,13 @@ namespace SearchForAnalogs
             if (currentDepthRecursion != depthRecursion)
             {
                 // поиск аналогов текущего товара
-                var searchRecords = Records.Where(r => r.GetRecord().Product1.Equals(productStart));
-
-                foreach (var searchRecord in searchRecords)
+                var searchRecords = Records.Where(r => r.GetRecord().Product1.Equals(productStart)).ToList();
+                int c = searchRecords.Count();
+                foreach(var searchRecord in searchRecords)
                 {
-                    //добавление товара в маршрут
-                    way.Add(searchRecord.GetRecord().Product1);
+                    if(way.Count!=0 && !way[way.Count-1].Equals(searchRecord.GetRecord().Product1))
+                        //добавление товара в маршрут
+                        way.Add(searchRecord.GetRecord().Product1);
 
                     if (searchRecord.GetRecord().Product2.Equals(productEnd))
                     {

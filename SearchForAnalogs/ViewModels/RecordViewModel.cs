@@ -90,15 +90,18 @@ namespace SearchForAnalogs
         }
 
         /// <summary>
-        /// Сравнение записей без Id для исключения повторяющихся записей
+        /// Сравнение записей без Id и Доверия для исключения повторяющихся записей
         /// </summary>
         /// <param name="record"></param>
         /// <returns></returns>
         public bool EqualsWithoutId(RecordViewModel record)
         {
-            return Confidence == record.Confidence && Article1 == record.Article1
+            return Article1 == record.Article1
                 && Manufacturer1 == record.Manufacturer1 && Article2 == record.Article2
-                && Manufacturer2 == record.Manufacturer2;
+                && Manufacturer2 == record.Manufacturer2 
+                 || Article1 == record.Article2
+                && Manufacturer1 == record.Manufacturer2 && Article2 == record.Article1
+                && Manufacturer2 == record.Manufacturer1;
         }
        
     }

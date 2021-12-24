@@ -30,10 +30,7 @@ namespace SearchForAnalogs
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            //обозначение первичных ключей для таблиц Товар и Производитель
-            modelBuilder.Entity<Manufacturer>().HasKey(p => p.Name);
-            modelBuilder.Entity<Product>().HasKey(p => p.Article);
+         
 
             //обозначение связей между таблицами
             modelBuilder.Entity<Product>()
@@ -52,6 +49,6 @@ namespace SearchForAnalogs
                .OnDelete(DeleteBehavior.ClientCascade);
 
         }
-
+       
     }
 }

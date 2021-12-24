@@ -10,6 +10,8 @@ namespace SearchForAnalogs.Models
     public class Product
     {
         [Key]
+        public int Id { get; set; }
+        [Required]
         public string Article { get; set; }
 
 
@@ -51,6 +53,6 @@ namespace SearchForAnalogs.Models
                 Manufacturer.Name.ToLower() == product.Manufacturer.Name.ToLower();
         }
 
-       
+        
     }
 }
