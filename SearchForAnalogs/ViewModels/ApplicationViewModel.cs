@@ -34,6 +34,11 @@ namespace SearchForAnalogs
         public ApplicationViewModel()
         {
 
+            UpdateDataGrid();
+        }
+        private void UpdateDataGrid()
+        {
+           
             db = new AnalogsDBContext();
 
             //загрузка данных из бд
@@ -43,9 +48,7 @@ namespace SearchForAnalogs
                                 .Include(u => u.Product2)
                                     .ThenInclude(c => c.Manufacturer)
                                 .Select(r => new RecordViewModel(r)).ToList());
-
         }
-
 
         // команда добавления
         public RelayCommand AddCommand
@@ -77,7 +80,6 @@ namespace SearchForAnalogs
                       if (selectedItem == null) return;
                       // получаем выделенный объект
                       RecordViewModel recordViewModel = selectedItem as RecordViewModel;
-                     
 
                       AddEditRecordSearchWindow recordWindow = new AddEditRecordSearchWindow(recordViewModel, false);
                       
@@ -88,12 +90,13 @@ namespace SearchForAnalogs
                           
                           if (editRecordViewModel != null)
                           {
-                              RecordAddEdit(editRecordViewModel, false);                             
-                             
+                           
+                              RecordAddEdit(editRecordViewModel, false);                                                     
                           }
                       }
-              
-                          
+                      UpdateDataGrid();
+                      MainWindow mainWindow = Application.Current.Windows[0] as MainWindow;
+                      mainWindow.recordsGrid.ItemsSource = Records;
                   }));
             }
         }
@@ -172,21 +175,30 @@ namespace SearchForAnalogs
         /// <summary>
         /// Добавление или обновление записи в бд
         /// </summary>
-        /// <param name="newRecord"></param>
+        /// <param name="newRecordView"></param>
         /// <param name="add"></param>
-        private void RecordAddEdit(RecordViewModel newRecord, bool add)
+        private void RecordAddEdit(RecordViewModel newRecordView, bool add)
         {
-           Record record = newRecord.GetRecord();
-            if (Records.Where(rv=>rv.EqualsWithoutId(newRecord) && rv.Id!=newRecord.Id).Count() == 0)
+          
+            Record newRecord = newRecordView.GetRecord();
+            Product product1 = CheckProduct(newRecordView.Article1);
+            Product product2 = CheckProduct(newRecordView.Article2);
+
+            if (product1 != null)
+                newRecord.Product1 = product1;
+            if (product2 != null)
+                newRecord.Product2 = product2;
+            
+            if (Records.Where(rv=>rv.EqualsWithoutId(newRecordView) && rv.Id!=newRecordView.Id).Count() == 0)
             {
                 if (add)
                 {
                    
-                    db.Records.Attach(record);                   
+                    db.Records.Attach(newRecord);                   
                     db.SaveChanges();
 
-                    newRecord.Id = Records.Count+1;
-                    Records.Add(newRecord);
+                    newRecordView.Id = Records.Count+1;
+                    Records.Add(newRecordView);
 
                     //выделение добавленной записи
                     MainWindow mainWindow = Application.Current.Windows[0] as MainWindow;
@@ -196,12 +208,27 @@ namespace SearchForAnalogs
 
                 else
                 {
+
                     db.SaveChanges();
                 }                 
             }
             else
                 MessageBox.Show("Такая запись уже существует!");
            
+        }
+        /// <summary>
+        /// Проверка существует ли уже такой товар
+        /// </summary>
+        /// <param name="article"></param>
+        /// <returns></returns>
+        private Product CheckProduct(string article)
+        {
+            Product product=null;
+            var products = db.Products.Where(p => p.Article == article);
+            if (products.Count()!=0)
+                product = products.First();
+
+            return product;
         }
        
         /// <summary>
@@ -217,7 +244,7 @@ namespace SearchForAnalogs
             {
                 // поиск аналогов текущего товара
                 var searchRecords = Records.Where(r => r.GetRecord().Product1.Equals(productStart)).ToList();
-                int c = searchRecords.Count();
+                
                 foreach(var searchRecord in searchRecords)
                 {
                     if(way.Count!=0 && !way[way.Count-1].Equals(searchRecord.GetRecord().Product1))
